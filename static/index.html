@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>picto</title>
+  <link rel="stylesheet" href="/css/libs/awesomplete.css" />
+  <link rel="stylesheet" href="/css/core.css" />
+  <link rel="stylesheet" href="/css/search.css" />
+  <script src="/js/libs/awesomplete.min.js"></script>
+  <script src="/js/xhr.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/index.js"></script>
+  <link rel="stylesheet" href="/css/libs/material-icons.css" />
+  <link rel="stylesheet" href="/css/nav.css" />
+  <link rel="stylesheet" href="/css/loadingbar.css" />
+  <script src="/js/searce.js"></script>
+</head>
+
+<body>
+  <div class="nav">
+    <div class="top">
+      <i class="material-icons" onclick="nav.changePath('/user',false,true)">account_circle</i>
+      <i class="material-icons" onclick="nav.changePath('/',false,true)">insert_photo</i>
+      <i class="material-icons" onclick="nav.changePath('/share',false,true)">share</i>
+    </div>
+    <div class="bottem">
+      <i class="material-icons" onclick="nav.changePath('/settings',false,true)">settings</i>
+    </div>
+  </div>
+
+  <div class="content">
+    <input data-multiple />
+    <br>
+    <div class="tiles">
+
+    </div>
+  </div>
+</body>
+
+</html>

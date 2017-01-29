@@ -1,0 +1,49 @@
+.nav {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background-color: #fff;
+  width: 3em;
+  transition: width ease 300ms;
+  text-align: center;
+  box-shadow: 2px 2px 4px 0 #ccc;
+  z-index: 100;
+}
+.nav:hover {
+  width: 4em;
+}
+
+.nav .material-icons {
+    font-size: 2.5em;
+    padding-bottom: 13px;
+    transition: font-size ease 250ms;
+    cursor: pointer;
+}
+
+.nav .material-icons:hover {
+    font-size: 3em;
+}
+
+.nav .top {
+    position: absolute;
+    top: 5px;
+    width: 100%;
+}
+
+.nav .bottem {
+    position: absolute;
+    bottom: 5px;
+    width: 100%;
+}
+
+.content {
+    position: absolute;
+    left: 3em;
+    right: 0;
+    transition: left ease 300ms;
+}
+
+.nav:hover ~ .content {
+  left: 4em;
+}
