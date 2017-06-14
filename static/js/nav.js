@@ -7,12 +7,12 @@ var nav = function nav(path) {
     get: function(key) {
       return this.query[key]
     },
-    set: function(key, value) {
+    set: function(key, value, dontKeepHistory) {
       this.query[key] = value;
-      that.changePath(that.path + this.serialize(),true)
+      that.changePath(that.path + this.serialize(),!dontKeepHistory)
     },
     remove: function(key) {
-      delete nav.query.query[key]
+      delete that.query.query[key]
       that.changePath(that.path + this.serialize(),true)
     },
     serialize: function() {
@@ -54,7 +54,7 @@ nav.prototype.changePath = function changePath(path, replace, loadPage) {
 	if (replace) {
 		window.history.replaceState(history.state, document.title, path);
 	} else {
-		window.history.pushState({prev: this.path}, document.title, path);
+		window.history.pushState({prev: location.pathname}, document.title, path);
 	}
 	this.path = location.pathname;
   if (loadPage) {
@@ -74,11 +74,6 @@ nav.prototype.createLoadingBar = function () {
   return bar;
 };
 
-window.onpopstate = function(e) {
-	console.log(e);
-	console.log(e.state, location.pathname);
-};
-
 var requestFrame = (function(){
   var raf = window.requestAnimationFrame ||
     function(fn){ return window.setTimeout(fn, 20); };
@@ -86,5 +81,10 @@ var requestFrame = (function(){
     return raf.call(window, fn);
   };
 })();
+
+window.onpopstate = function(e){
+	console.log(e);
+	location.pathname = e.state.prev
+};
 
 window.nav = new nav()

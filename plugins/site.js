@@ -32,6 +32,14 @@ site.prototype.init = function init(_cb) {
 		res.json(tags);
 	});
 
+	this.picto.server.app.get("/checkPort/:port", function(req, res, next) {
+		var port = parseInt(req.params.port);
+		if (isNaN(port)) next()
+		self.picto.isPortTaken(port,function(is) {
+			res.json(is)
+		});
+	});
+
 	this.picto.server.app.get('/images', function(req, res, next) {
 		var q = req.query.tags ? req.query.tags.split(",") : [];
 		var limit = parseInt(req.query.limit) || 20;
@@ -45,4 +53,35 @@ site.prototype.init = function init(_cb) {
 			images: pics.slice(offset,offset+limit)
 		});
 	})
+
+	this.picto.server.app.get('/image_data/:id', function(req, res, next) {
+		var img = self.picto.db.getimage(req.params.id);
+		if (!img) return res.status(404).json({
+			message: 'Photo not found'
+		});
+
+		var q = req.query.tags ? req.query.tags.split(",") : [];
+		var limit = parseInt(req.query.limit) || 20;
+		var pics = self.picto.db.getAllImages(q)
+		var index = pics.findIndex(function(a) {return a.id == img.id})
+		var upper = Math.min(index + Math.ceil(limit/2),pics.length)
+		var lower = Math.max(index - Math.floor(limit/2),0)
+
+		res.json({
+			limit:limit,
+			upper: upper,
+			lower: lower,
+			index: index,
+			total: pics.length,
+			images: pics.slice(lower,upper)
+		});
+	})
+
+
+	this.picto.server.app.get('/full/:id', function(req, res, next) {
+	res.sendFile(self.picto.dirname + "/static/full.html", null, function(err) {
+			if (err) next()
+		});
+	})
+
 }

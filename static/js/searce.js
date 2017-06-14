@@ -6,6 +6,11 @@ var xhrTags = new xhr().on("success",function(list) {
 function initTags() {
   if (location.pathname != "/") return;
 
+  if (typeof Awesomplete === 'undefined') {
+    console.log("Awesomplete not loaded yet, retrying in 50ms!");
+    return setTimeout(function() {initTags()},50)
+  }
+
   window.inp = new Awesomplete('input[data-multiple]', {
     filter: function(text, input) {
       return Awesomplete.FILTER_CONTAINS;
@@ -36,12 +41,16 @@ function initTags() {
       // history.replaceState(history.state, document.title, location.pathname + "?tags=" + this.value.split(", ").filter(a => a != "").join(",") + (getParameterByName("page") != null ? ("&page=" + getParameterByName("page")) : ""));
       // history.replaceState(history.state, document.title, location.pathname + (this.value == "" ? "" : serialize({tags:this.value.split(", ").filter(a => a != "").join(",")})));
       if (this.value == "") nav.query.remove("tags"); else nav.query.set("tags",this.value.split(", ").filter(a => a != "").join(","))
-      return get_images()
+
+      offset = 0;
+      document.querySelector(".tiles").innerHTML = "";
+      document.querySelector('input[data-multiple]').blur()
+      return loadPage(1)
     }
     if (evt.keyCode == 38 || evt.keyCode == 40) return;
     var parts = this.value.split(", ")
     var curr = this.value.substring(0,this.selectionStart).split(", ").length - 1;
-    xhrTags.abort().url("http://localhost:3000/tag/" + parts[curr]).go()
+    xhrTags.abort().url("/tag/" + parts[curr]).go()
   }
 
   if (nav.query.get("tags")) document.querySelector("input[data-multiple]").value = nav.query.get("tags").replace(/,/g, ', ');

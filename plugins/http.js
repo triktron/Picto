@@ -31,8 +31,9 @@ function server(picto) {
 server.prototype.init = function init() {
 	var self = this;
 	this.app.use(function(req,res,next) {
-		if (req.originalUrl.endsWith(".tem")) res.sendStatus(404); else next();
-	},express.static(this.picto.dirname + '/static',{extensions:"html"}));
+		if (req.originalUrl.endsWith(".tem") || req.originalUrl.endsWith("full.html")) res.sendStatus(404).end("Cannot GET " + req.path); else next();
+	});
+	this.app.use( express.static(this.picto.dirname + '/static',{extensions:"html"}))
 	// this.app.get("/",function(req,res) {
 	//   res.end((req.socket.encrypted ? 'HTTPS' : 'HTTP') + ' Connection!');
 	// })
@@ -40,7 +41,7 @@ server.prototype.init = function init() {
 	httpolyglot.createServer({
 		key: fs.readFileSync('server.key'),
 		cert: fs.readFileSync('server.crt')
-	}, this.app).listen(this.port, 'localhost', function() {
+	}, this.app).listen(this.port, function() {
 		console.log('server listening on port', self.port);
 	});
 }

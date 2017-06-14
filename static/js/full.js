@@ -1,24 +1,84 @@
-window.images = []
-
-function loadImages(raw,_cb) {
-  var len = raw.length, done = 0;
-  for (var i of raw) {
-    var img = new Image();
-    img.onload = function() {
-      images.push({
-        img:this,
-        width:this.naturalWidth,
-        height: this.naturalHeight
-      })
-      done++;
-      if (len == done) _cb&&_cb()
-    }
-    img.src = i;
-  }
+function getId() {
+  return Number(location.pathname.split("/").pop())
+}
+function getTags() {
+  return nav.query.get("tags")
 }
 
+/*
 window.addEventListener("load",function() {
-  loadImages(["img/6","img/7","img/8","img/9","img/10","img/11"],postInit);
+  new xhr().on("success",function(res) {
+    var index = res.index - res.lower;
+
+
+
+    console.log(res.index , res.lower);
+    console.log(res.images[index]);
+    var f = res.images.splice(index, 1)[0];
+    console.log(f);
+    loadImages([f.id],function() {
+      postInit()
+      loadImages(res.images.map(i => i.id))
+    });
+  }).url("/image_data/" + document.location.pathname.split("/").reverse().find(function(a) {return a}) + (nav.query.get("tags") ? "?tags=" + nav.query.get("tags") : "")).go();
+})*/
+
+
+
+/// --- loader ---
+window.addEventListener("load",function() {
+  updateTree().then(function() {
+    postInit()
+  })
+})
+
+function updateTree() {
+  return new Promise(function(resolve, reject) {
+    new xhr().on("success",function(res) {
+      index = res.index;
+      images = new Array(res.total);
+      Array.prototype.splice.apply(images,[res.lower,res.images.length].concat(res.images))
+
+      Promise.all([loadImage(index - 1),loadImage(index),loadImage(index + 1)]).then(function() {
+        preLoadImages();
+        resolve()
+      })
+
+    }).url("/image_data/" + document.location.pathname.split("/").reverse().find(function(a) {return a}) + (nav.query.get("tags") ? "?tags=" + nav.query.get("tags") : "")).go();
+  });
+}
+
+function loadImage(index) {
+  return new Promise(function(resolve, reject) {
+    if (!images[index]) return resolve()
+    if (images[index].img) return resolve()
+    var img = new Image();
+    img.onload = function() {
+      images[index].img = this;
+      images[index].width = this.naturalWidth;
+      images[index].height = this.naturalHeight;
+      resolve()
+    }
+    img.onerror = function(e) {
+      reject(e)
+    }
+    img.src = "/raw/" + images[index].id;
+  });
+}
+
+function preLoadImages() {
+  Promise.all(images.map(function(a,b) {return loadImage(b)})).then(function() {
+    console.log("pre load done");
+  })
+}
+
+
+/// ---  bare ---
+
+window.images = []
+
+window.addEventListener("load",function() {
+  // loadImages(["img/6","img/7","img/8","img/9","img/10","img/11"],postInit);
 })
 
 function postInit() {
@@ -32,13 +92,13 @@ function postInit() {
 	});
   var con = document.querySelector(".img");
   con.addEventListener("mousedown",mousedown);
-  con.addEventListener("mouseup",mouseup);
   document.addEventListener("mouseup",mouseup);
   con.addEventListener("mousemove",mousemove);
-  con.addEventListener('touchstart', mousedown)
-  con.addEventListener('touchend', mouseup)
-  con.addEventListener('touchmove', mousemove)
-  con.addEventListener("wheel", zoom);
+  con.addEventListener('touchstart', mousedown, {passive: true})
+  con.addEventListener('touchend', mouseup, {passive: true})
+  con.addEventListener('touchmove', mousemove, {passive: true})
+  window.addEventListener("resize",() => update(true), {passive: true})
+  window.addEventListener("resize",() => console.log("res"), {passive: true})
   update()
 }
 
@@ -54,64 +114,45 @@ function mousemove(e) {
   dragFrame("move", e)
 }
 
-var start;
-function dragFrameStart(e) {
-
-}
-
-var down = false, startX, startX2;
+var down = false, startX;
 function dragFrame(type,e) {
   e.preventDefault()
-  var x = e.pageX;
+  var x = e.clientX;
   if (e.changedTouches) x = e.changedTouches[0].clientX;
-
-  // breakpoint;
-
-  var br = document.querySelector(".img-" + index).getBoundingClientRect();
-  var o = 0;
- if (br.left > 0) o = br.left;
 
   if (type == "start") {
     down = true;
-    var b = e.srcElement.getBoundingClientRect();
-    startX = x - b.left;
-    var b = document.querySelector(".img").getBoundingClientRect();
-    startX2 = x - b.left;
+    startX = x;
   }
 
   if (type == "stop") {
     down = false;
-    // if (o && o < 0) prev();
-    // if (o && o > 0) next();
-    console.log("stop");
-    // update()
+    if (x - startX < -window.innerWidth / 4.5) prev();
+    if (x - startX > window.innerWidth / 4.5) next();
+    update()
   }
 
   if (type == "move" && down) {
-    // console.log(-(window.innerWidth * index) + x - startX);
-
-    // var s = maxSize(images[index].width,images[index].height,window.innerWidth,window.innerHeight);
-    // console.log(e.srcElement.getBoundingClientRect().left - positioner({x:0,y:0,w:s.w,h:s.h}).x);
-
-    // console.log(o, x , startX2 );
-
-    noAni(document.querySelector(".img"),-(window.innerWidth * index) + x - startX2  + "px"); //(index == 0 ? 0 : -images[index].left) +
-    // if (o) {
-    // } else {
-      // noAni(e.srcElement,(window.innerWidth * index) + x - startX + "px"); //(index == 0 ? 0 : -images[index].left) +
-    // }
-    // console.log(x , startX );
-    // noAni(e.srcElement,-(window.innerWidth * index) + x - startX + "px"); //(index == 0 ? 0 : -images[index].left) +
+    noAni(document.querySelector(".img"),-(window.innerWidth * index) + x - startX  + "px");
   }
 }
 
 function prev() {
-  if (index < images.length - 1) index++;
+  if (index == images.length - 1) return;
+  index++;
+  updatePath();
   update();
 }
 function next() {
-  if (index > 0) index--;
+  if (index == 0) return;
+  index--;
+  updatePath()
   update();
+}
+
+function updatePath() {
+  nav.changePath("/full/" + images[index].id + nav.query.serialize())
+  updateTree()
 }
 
 window.index = 0;
@@ -200,8 +241,8 @@ function updateImage(img) {
   //
   // img.style.top = con.getAttribute("y-offset") + "px";
 
+  resetZoom(img)
   if (!con.getAttribute("zoom-width")) {
-    resetZoom(img)
   }
 }
 
@@ -209,15 +250,15 @@ function resetZoom(img) {
   var con = img.parentElement;
   var s = maxSize(img.naturalWidth,img.naturalHeight,window.innerWidth,window.innerHeight)
 
-  // con.setAttribute("zoom-width",s.w);
-  // con.setAttribute("zoom-height",s.h);
+  con.setAttribute("zoom-width",s.w);
+  con.setAttribute("zoom-height",s.h);
 
   var p = positioner({x:0,y:0,w:s.w,h:s.h});
-  // con.setAttribute("zoom-x",Math.round(p.x));
-  // con.setAttribute("zoom-y",Math.round(p.y));
+  con.setAttribute("zoom-x",Math.round(p.x));
+  con.setAttribute("zoom-y",Math.round(p.y));
 
-  // img.style.left = p.x + "px";
-  // img.style.top = p.y + "px";
+  img.style.left = p.x + "px";
+  img.style.top = p.y + "px";
   img.style.width = s.w + "px";
   img.style.height = s.h + "px";
 }
@@ -241,63 +282,4 @@ function positioner(pos) {
 	if (pos.y + pos.h < window.innerHeight) pos.y = window.innerHeight - pos.h - cY;
 
 	return pos;
-}
-
-function zoom(e) {
-  var img = e.target;
-  var con = img.parentElement;
-	var deltaY = 0;
-  var bgPosX = parseInt(con.getAttribute("zoom-x"))
-  var bgPosY = parseInt(con.getAttribute("zoom-y"))
-  var bgWidth = parseInt(con.getAttribute("zoom-width"));
-  var bgHeight = parseInt(con.getAttribute("zoom-height"));
-
-	if (e.deltaY) { // FireFox 17+ (IE9+, Chrome 31+?)
-		deltaY = e.deltaY;
-	} else if (e.wheelDelta) {
-		deltaY = -e.wheelDelta;
-	}
-
-	var offsetX = e.pageX;
-	var offsetY = e.pageY;
-
-	// Record the offset between the bg edge and cursor:
-	var bgCursorX = offsetX - bgPosX;
-	var bgCursorY = offsetY - bgPosY;
-
-	// Use the previous offset to get the percent offset between the bg edge and cursor:
-	var bgRatioX = bgCursorX / bgWidth;
-	var bgRatioY = bgCursorY / bgHeight;
-
-	// Update the bg size:
-	if (e.scale) {
-		bgWidth = bgWidth * e.scale;
-		bgHeight = bgHeight * e.scale;
-	} else if (deltaY < 0) {
-		bgWidth += bgWidth * .1//settings.zoom;
-		bgHeight += bgHeight * .1//settings.zoom;
-	} else {
-		bgWidth -= bgWidth * .1//this.settings.zoom;
-		bgHeight -= bgHeight * .1//this.settings.zoom;
-	}
-
-	// Take the percent offset and apply it to the new size:
-	bgPosX = offsetX - (bgWidth * bgRatioX);
-	bgPosY = offsetY - (bgHeight * bgRatioY);
-
-	// Prevent zooming out beyond the starting size
-	// if (bgWidth <= this.width || this.bgHeight <= this.height) {
-
-    // con.setAttribute("zoom-width",bgWidth);
-    // con.setAttribute("zoom-height",bgHeight);
-
-    // con.setAttribute("zoom-x",bgPosX);
-    // con.setAttribute("zoom-y",bgPosY);
-
-
-    // img.style.left = bgPosX + "px";
-    // img.style.top = bgPosY + "px";
-    img.style.width = bgWidth + "px";
-    img.style.height = bgHeight + "px";
-	// }
 }

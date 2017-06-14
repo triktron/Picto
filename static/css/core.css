@@ -12,3 +12,36 @@ body {
   margin: .5em;
   box-shadow: 2px 2px 4px 0 #ccc;
 }
+
+.paginator {
+    display: block;
+    padding: 2em 0 1em 0;
+    font-size: 1em;
+    text-align: center;
+    font-weight: bold;
+    clear: both;
+}
+
+.paginator span {
+    margin: 0 3px;
+    padding: 2px 6px;
+    cursor: default;
+}
+
+.paginator a {
+    margin: 3px 3px;
+    padding: 2px 6px;
+    font-weight: normal;
+    border: 1px solid #8899af;
+    background: #8899af;
+    color: #092146;
+    border-radius: 4px;
+    box-shadow: 2px 2px 5px #07162D;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.paginator a:hover {
+    background: rgb(60, 60, 220);
+    color: white;
+}

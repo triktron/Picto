@@ -22,6 +22,10 @@ git clone this res.
 
 ## Change Log
 
+### 0.2.X
+
+* first working version.
+
 ### 0.1.X
 
 * Initial version.
