@@ -6,7 +6,7 @@ module.exports = function(path, _cb) {
 	this.config = {
     port: 3000,
 		lastId: 0,
-		database: __dirname + "/databases/main/"
+		database: "./databases/main/"
   };
   this.loaded = false;
 

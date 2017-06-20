@@ -1,9 +1,9 @@
-#Picto
+##Picto
 a tag based image viewer
 
 ### Demo
 
-view:(comming to you soon)
+view:(coming to you soon)
 
 ### Installation
 git clone this res.
@@ -16,14 +16,19 @@ git clone this res.
     -h, --help           output usage information
     -V, --version        output the version number
     -p, --port <n>       Listen on port <n>
-    -c, --config [file]  Load a specified config file [config.json]
-    -a, --add [file]     Add an image [image]
+    -c, --config [file]  Load a specified configuration file [config.json]
+    -a, --add [files]    Add an image [image]
+    -r                   removes source image
+    -t, --tags [tags]    sets a tag for added images
+    -d, --description    sets a description for added images
+    -i, --info           sets the info for added images
 
 
 ## Change Log
 
 ### 0.2.X
 
+* now supports batch image adding!
 * first working version.
 
 ### 0.1.X
@@ -32,7 +37,7 @@ git clone this res.
 
 ### Todo's
 * Write Demo
-* add inpage image adder.
+* add in-page image adder.
 * add more ways to install.
 
 License
