@@ -5,6 +5,7 @@ var fs = require('fs-extra');
 var events = require('events');
 var inquirer = require('inquirer');
 var glob = require("glob")
+var path = require('path');
 
 var preventStarting = false;
 var argv = require('yargs')
@@ -61,12 +62,12 @@ var argv = require('yargs')
 
 					var baseSettings = {
 		        tags: (argv.tags || answers.tags != null) ? (argv.tags || answers.tags).split(",") : [],
-		        info: argv.info ? argv.info.split(",").map(function(a) {
+		        info: [{key:"file-name"}].concat(argv.info ? argv.info.split(",").map(function(a) {
 		          return {
 		            key: a.split(":")[0],
 		            value: a.split(":")[1]
 		          }
-		        }) : [],
+		        }) : []),
 		        description: argv.description || answers.description || ""
 		      };
 
@@ -76,6 +77,7 @@ var argv = require('yargs')
 						config.set("lastId", ++id);
 						baseSettings.id = id;
 						baseSettings.src = file;
+            baseSettings.info[0].value = path.basename(file);
 						return picto.db.add(baseSettings, argv.remove, false)
           })).then(function() {
             console.log("done");

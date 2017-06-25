@@ -18,10 +18,8 @@ function server(picto) {
 		express: this.app,
 		noCache: true
 	});
-	this.app.use(function(req, res, next) {
-		res.setHeader('Access-Control-Allow-Origin', '*');
-		next();
-	})
+
+	this.router = express.Router()
 
 	picto.on("init", function() {
 		self.init()
@@ -30,13 +28,15 @@ function server(picto) {
 
 server.prototype.init = function init() {
 	var self = this;
-	this.app.use(function(req,res,next) {
-		if (req.originalUrl.endsWith(".tem") || req.originalUrl.endsWith("full.html")) res.sendStatus(404).end("Cannot GET " + req.path); else next();
-	});
-	this.app.use( express.static(this.picto.dirname + '/static',{extensions:"html"}))
-	// this.app.get("/",function(req,res) {
-	//   res.end((req.socket.encrypted ? 'HTTPS' : 'HTTP') + ' Connection!');
-	// })
+	this.app.use(function(req, res, next) {
+		res.setHeader('Access-Control-Allow-Origin', '*');
+		next();
+	})
+	this.app.use(/.{0,}\.njk$/, function(req, res, next) {
+		res.status(404).send("Cannot " + req.method + " " + req.baseUrl);
+	})
+	this.app.use(this.router)
+	this.app.use(express.static(this.picto.dirname + '/static',{extensions:"html", redirect: false}))
 
 	httpolyglot.createServer({
 		key: fs.readFileSync('server.key'),

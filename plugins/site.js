@@ -6,6 +6,17 @@ function site(picto) {
 	var self = this;
 	this.picto = picto;
 
+	this.nav = {
+		top: [
+			{path:"user",icon:"account_circle"},
+			{path:"",icon:"insert_photo"},
+			{path:"share",icon:"share"}
+		],
+		bottom: [
+			{path:"settings",icon:"settings"}
+		]
+	}
+
 	picto.on("init", function() {
 		self.init()
 	});
@@ -13,7 +24,11 @@ function site(picto) {
 
 site.prototype.init = function init(_cb) {
 	var self = this;
-	this.picto.server.app.get("/raw/:id", function(req, res, next) {
+	this.picto.server.router.get("/", function(req, res, next) {
+		res.render("index.njk", {navs:self.nav})
+	})
+
+	this.picto.server.router.get("/raw/:id", function(req, res, next) {
 		var img = self.picto.db.getimage(req.params.id);
 		if (!img) return res.status(404).json({
 			message: 'Photo not found'
@@ -26,13 +41,13 @@ site.prototype.init = function init(_cb) {
 		});
 	});
 
-	this.picto.server.app.get("/tag/(:tag)?", function(req, res, next) {
+	this.picto.server.router.get("/tag/(:tag)?", function(req, res, next) {
 		var q = req.params.tag ? req.params.tag : "";
 		var tags = self.picto.db.getAllTags(q)
 		res.json(tags);
 	});
 
-	this.picto.server.app.get("/checkPort/:port", function(req, res, next) {
+	this.picto.server.router.get("/checkPort/:port", function(req, res, next) {
 		var port = parseInt(req.params.port);
 		if (isNaN(port)) next()
 		self.picto.isPortTaken(port,function(is) {
@@ -40,7 +55,7 @@ site.prototype.init = function init(_cb) {
 		});
 	});
 
-	this.picto.server.app.get('/images', function(req, res, next) {
+	this.picto.server.router.get('/images', function(req, res, next) {
 		var q = req.query.tags ? req.query.tags.split(",") : [];
 		var limit = parseInt(req.query.limit) || 20;
 		var offset = parseInt(req.query.offset) || 0;
@@ -54,7 +69,7 @@ site.prototype.init = function init(_cb) {
 		});
 	})
 
-	this.picto.server.app.get('/image_data/:id', function(req, res, next) {
+	this.picto.server.router.get('/image_data/:id', function(req, res, next) {
 		var img = self.picto.db.getimage(req.params.id);
 		if (!img) return res.status(404).json({
 			message: 'Photo not found'
@@ -78,10 +93,8 @@ site.prototype.init = function init(_cb) {
 	})
 
 
-	this.picto.server.app.get('/full/:id', function(req, res, next) {
-	res.sendFile(self.picto.dirname + "/static/full.html", null, function(err) {
-			if (err) next()
-		});
+	this.picto.server.router.get('/full/:id', function(req, res, next) {
+		res.render("full.njk");
 	})
 
 }
