@@ -1,4 +1,4 @@
-##Picto
+# Picto
 a tag based image viewer
 
 ### Demo
