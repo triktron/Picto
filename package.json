@@ -1,6 +1,6 @@
 {
   "name": "picto",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "a tag based image viewer",
   "main": "index.js",
   "scripts": {
@@ -21,6 +21,7 @@
     "glob": "^7.1.2",
     "httpolyglot": "0.1.2",
     "inquirer": "2.0.0",
+    "nedb": "^1.8.0",
     "nunjucks": "3.0.0",
     "pajk-lwip": "^0.2.0"
   }

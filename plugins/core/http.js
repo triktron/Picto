@@ -13,7 +13,7 @@ function server(picto) {
 	this.port = 3000;
 
 	this.app = express();
-	nunjucks.configure('static', {
+	nunjucks.configure({
 		autoescape: true,
 		express: this.app,
 		noCache: true
@@ -36,7 +36,6 @@ server.prototype.init = function init() {
 		res.status(404).send("Cannot " + req.method + " " + req.baseUrl);
 	})
 	this.app.use(this.router)
-	this.app.use(express.static(this.picto.dirname + '/static',{extensions:"html", redirect: false}))
 
 	httpolyglot.createServer({
 		key: fs.readFileSync('server.key'),

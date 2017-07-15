@@ -30,6 +30,8 @@ git clone this res.
 
 * now supports batch image adding!
 * first working version.
+* switched to nedb for the database.
+* made it possible for plugins to add web pages.
 
 ### 0.1.X
 
@@ -39,6 +41,7 @@ git clone this res.
 * Write Demo
 * add in-page image adder.
 * add more ways to install.
+* Design icon
 
 License
 ----

@@ -72,17 +72,35 @@ var argv = require('yargs')
 		      };
 
 				glob(argv.files || answers.files, function(er, files) {
-          Promise.all(files.map(function(file) {
+          var imgs = files.map(function(file) {
             var id = config.get("lastId")
 						config.set("lastId", ++id);
-						baseSettings.id = id;
-						baseSettings.src = file;
-            baseSettings.info[0].value = path.basename(file);
-						return picto.db.add(baseSettings, argv.remove, false)
-          })).then(function() {
-            console.log("done");
-            picto.db.save()
+						return {
+              id: id,
+              src: file,
+  		        tags: (argv.tags || answers.tags != null) ? (argv.tags || answers.tags).split(",") : [],
+  		        info: [{key:"file-name", "value": path.basename(file)}].concat(argv.info ? argv.info.split(",").map(function(a) {
+  		          return {
+  		            key: a.split(":")[0],
+  		            value: a.split(":")[1]
+  		          }
+  		        }) : []),
+  		        description: argv.description || answers.description || ""
+  		      }
           })
+
+          function next() {
+            var n = imgs.shift();
+            if (!n) return console.log("done");
+
+            picto.db.add(n, argv.remove, false).then(function() {
+              next();
+            }).catch(function(err) {
+              console.log(err);
+              next();
+            })
+          }
+          next()
 				})
     });
 	};
@@ -90,7 +108,7 @@ var argv = require('yargs')
 	preventStarting = function() {
 		fs.emptyDirSync(config.get("database") + "images")
 		fs.emptyDirSync(config.get("database") + "thumbs")
-		fs.removeSync(config.get("database") + "db.json")
+		fs.removeSync(config.get("database") + "db.db")
 		config.set("lastId",0)
 	}
 })
@@ -102,10 +120,7 @@ var config = require("./config.js");
 config = new config(argv.config, init);
 
 function init() {
-  picto.db.init(postInit);
-}
-
-function postInit() {
+  picto.db.init();
   picto.server.port = argv.port || config.get("port");
 	if (preventStarting) return preventStarting();
 	picto.emit("init")
@@ -126,9 +141,16 @@ picto.prototype.__proto__ = events.EventEmitter.prototype;
 var picto = new picto()
 
 fs.readdirSync(__dirname + '/plugins/').forEach(function(file) {
-  if (file.match(/\.js$/) !== null) {
+  /*if (file.match(/\.js$/) !== null) {
     var name = file.replace('.js', '');
     var s = require(__dirname + '/plugins/' + file);
     if (s.preInit) s.preInit(picto)
+  }*/
+  if (fs.lstatSync(__dirname + '/plugins/' + file).isDirectory() && fs.existsSync(__dirname + '/plugins/' + file + "/package.json")) {
+    var package = fs.readJsonSync(__dirname + '/plugins/' + file + "/package.json");
+    package.files.forEach(function(a) {
+      var s = require(__dirname + '/plugins/' + file + "/" + a);
+      if (s.preInit) s.preInit(picto)
+    })
   }
 });

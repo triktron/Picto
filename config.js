@@ -24,9 +24,8 @@ module.exports = function(path, _cb) {
         self.loaded = true;
 				_cb(true)
 			} catch (ex) {
-				console.error("file is not a config file! creating it.",ex);
-				self.save();
-				_cb(false)
+				console.error("file is not a config file!", ex);
+				process.exit();
 			}
 		});
 	}

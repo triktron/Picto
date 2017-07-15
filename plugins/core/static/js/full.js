@@ -151,7 +151,7 @@ function next() {
 }
 
 function updatePath() {
-  nav.changePath("/full/" + images[index].id + nav.query.serialize())
+  nav.changePath("/full/" + images[index].id + nav.query.serialize(), true)
   updateTree()
 }
 

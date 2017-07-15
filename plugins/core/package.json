@@ -1,0 +1,15 @@
+{
+  "name": "core",
+  "version": "1.0.0",
+  "description": "the core plugins of Picto",
+  "author": "Triktron",
+  "license": "ISC",
+
+  "files": [
+    "db.js",
+    "http.js",
+    "portChecker.js",
+    "site.js",
+    "rest.js"
+  ]
+}

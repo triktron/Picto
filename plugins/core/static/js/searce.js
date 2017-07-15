@@ -40,12 +40,13 @@ function initTags() {
     if (evt.keyCode == 13) {
       // history.replaceState(history.state, document.title, location.pathname + "?tags=" + this.value.split(", ").filter(a => a != "").join(",") + (getParameterByName("page") != null ? ("&page=" + getParameterByName("page")) : ""));
       // history.replaceState(history.state, document.title, location.pathname + (this.value == "" ? "" : serialize({tags:this.value.split(", ").filter(a => a != "").join(",")})));
-      if (this.value == "") nav.query.remove("tags"); else nav.query.set("tags",this.value.split(", ").filter(a => a != "").join(","))
+      // if (this.value == "") nav.query.remove("tags"); else nav.query.set("tags",this.value.split(", ").filter(a => a != "").join(","))
 
-      offset = 0;
-      document.querySelector(".tiles").innerHTML = "";
-      document.querySelector('input[data-multiple]').blur()
-      return loadPage(1)
+      // offset = 0;
+      // document.querySelector(".tiles").innerHTML = "";
+      // document.querySelector('input[data-multiple]').blur()
+      var tags = this.value.split(", ").filter(a => a != "").join(",")
+      return nav.changePath('/' + (tags ? "?tags=" + tags : ""),false,true)
     }
     if (evt.keyCode == 38 || evt.keyCode == 40) return;
     var parts = this.value.split(", ")

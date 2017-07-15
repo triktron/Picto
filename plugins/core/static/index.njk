@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>picto</title>
+  <link rel="stylesheet" href="/css/libs/awesomplete.css" />
+  <link rel="stylesheet" href="/css/libs/perfect-scrollbar.min.css" />
+  <link rel="stylesheet" href="/css/core.css" />
+  <link rel="stylesheet" href="/css/search.css" />
+  <script src="/js/libs/awesomplete.min.js"></script>
+  <script src="/js/libs/perfect-scrollbar.min.js"></script>
+  <script src="/js/xhr.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/index.js"></script>
+  <link rel="stylesheet" href="/css/libs/material-icons.css" />
+  <link rel="stylesheet" href="/css/nav.css" />
+  <link rel="stylesheet" href="/css/loadingbar.css" />
+  <script src="/js/searce.js"></script>
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+</head>
+
+<body>
+  <div class="nav">
+    <div class="top">
+      {% for nav in navs.top %}
+      <i class="material-icons" onclick="nav.changePath('/{{ nav.path }}',false,true)">{{ nav.icon }}</i> {% endfor %}
+    </div>
+    <div class="bottem">
+      {% for nav in navs.bottom %}
+      <i class="material-icons" onclick="nav.changePath('/{{ nav.path }}',false,true)">{{ nav.icon }}</i> {% endfor %}
+    </div>
+  </div>
+
+  <div class="content">
+    <input data-multiple />
+    <br>
+    <div class="tiles">
+      {%- macro paginator() %}
+      <div class="paginator">
+        {%- macro link(p, tags) %}/?page={{ p }}{% if tags %}&tags={{ tags }}{% endif %}{% endmacro %} {%- if page == 1 -%}
+
+        <span>« Previous</span> {%- else -%}
+        <a href="{{ link(page - 1, tags) }}">« Previous</a> {%- endif -%} {%- for p in range(1, pages + 1) -%} {%- if p == page -%}
+        <span>{{ p }}</span> {%- else -%}
+        <a href="{{ link(p, tags) }}">{{ p }}</a> {%- endif -%} {%- endfor -%} {%- if page == pages -%}
+        <span>Next »</span> {%- else -%}
+        <a href="{{ link(page + 1, tags) }}">Next »</a> {%- endif -%}
+      </div>
+      {% endmacro %}
+
+      {{ paginator() }}
+
+      {% for img in images %}
+      <div class="item">
+        <div class="thumbnail"><a href="/full/{{ img.id }}"><img src="/raw/{{ img.id }}?thumb"></a></div>
+      </div>
+      {% else %}
+        no images found
+      {% endfor %}
+
+      {{ paginator() }}
+
+    </div>
+  </div>
+</body>
+
+</html>

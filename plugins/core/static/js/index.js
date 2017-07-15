@@ -55,7 +55,7 @@ function init() {
 
 
 
-  page = Number(nav.query.get("page")) || 1;
+  /*page = Number(nav.query.get("page")) || 1;*/
   /*
   document.querySelector(".tiles").addEventListener("wheel", function(e) {
     nav.query.set("offset",Math.floor(this.scrollTop / tileSize * tilesPerRow), true)
@@ -63,10 +63,10 @@ function init() {
 
 
 
-  loadPage(page)
+  /*loadPage(page)*/
 }
 
-var xhrImages = new xhr().on("success",function(images) {
+/*var xhrImages = new xhr().on("success",function(images) {
   var t = "";
   for (var i of images.images) t += "<div class=\"item\"><div class=\"thumbnail\"><a href=\"/full/" + i.id + (nav.query.get("tags") ? "?tags=" + nav.query.get("tags") : "") + "\"><img src=\"/raw/" + i.id + "?thumb\"></img></a></div></div>";
 
@@ -82,11 +82,11 @@ var xhrImages = new xhr().on("success",function(images) {
   document.querySelector(".tiles").innerHTML = t;
   calculateTiles();
   loadingNext = false;
-});
+});*/
 
-function loadPage(n) {
+/*function loadPage(n) {
   if (location.pathname != "/") return;
   page = n;
   nav.query.set("page",n)
   xhrImages.abort().url("/images/?limit=" + perPage + "&offset=" + (page - 1) * perPage + (nav.query.get("tags") ? "&tags=" + nav.query.get("tags") : "")).go()
-}
+}*/
