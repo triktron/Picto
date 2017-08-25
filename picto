@@ -1,0 +1,116 @@
+#!/usr/bin/env node
+
+const fs = require('fs-extra');
+
+fs.ensureDir(__dirname + '/plugins/')
+
+var plugins = [];
+fs.readdirSync(__dirname + '/plugins/').forEach(function(file) {
+  if (fs.lstatSync(__dirname + '/plugins/' + file).isDirectory() && fs.existsSync(__dirname + '/plugins/' + file + "/plugin.json")) {
+    plugins.push(fs.readJsonSync(__dirname + '/plugins/' + file + "/plugin.json"));
+  }
+});
+
+var argv = require('yargs')
+  .usage('Usage: picto <cmd> [options]')
+  .command('add [file]', 'add an image')
+  .command('remove [id]', 'removes an image')
+  .command('tags list-all', 'lists all tags')
+  .command('tags list [id]', 'lists all tags')
+  .command('tags set', 'lists all tags')
+  .command('tags remove', 'lists all tags')
+  .command('tags add', 'lists all tags')
+  .option('c', {
+    alias: 'config',
+    description: 'the config file',
+    default: './config.json'
+  })
+  .option('h', {
+    alias: 'help',
+    description: 'display help message'
+  })
+  .help('help')
+  .version(require('./package.json').version)
+  .alias('version', 'v');
+
+for (plugin of plugins) {
+  if(plugin.command) {
+    for (var command in plugin.command) {
+      argv.command(command, plugin.command[command].description)
+    }
+  }
+}
+
+  argv = argv.argv;
+
+var picto = {};
+
+picto.argv = argv;
+
+picto.config = require("./lib/config/config")(argv.config, true);
+picto.db = require("./lib/database/database")(picto);
+
+if (argv._[0] == "add") {
+  var glob = require("glob");
+  var sizeOf = require('image-size');
+  var path = require("path")
+
+  var parms = argv._.slice(1).concat([argv.file]);
+
+  parms.map(function(parm) {
+    glob(parm, function(err, files) {
+      if (err) return console.error(err);
+
+      files.map(function(file) {
+        var dimensions = sizeOf(file);
+        picto.db.add(file,false, [{key:"filename", value: path.basename(file)},{key:"width",value:dimensions.width},{key:"height",value:dimensions.height}], function(succ) {
+          if (succ) console.log(file, "was sucsesfully added!"); else console.log(file, "was not added!")
+        });
+      });
+    });
+  })
+
+  return;
+}
+
+if (argv._[0] == "remove") {
+  picto.db.remove(argv.id, function(succ) {
+    if (succ) console.log(argv.id, "was sucsesfully removed!"); else console.log(argv.id, "was not removed!")
+  })
+
+  return;
+}
+
+if (argv._[0] == "tags") {
+  if (argv._[1] == "list-all") {
+
+  }
+  if (argv._[1] == "list") {
+
+  }
+  if (argv._[1] == "set") {
+
+  }
+  if (argv._[1] == "remove") {
+
+  }
+  if (argv._[1] == "add") {
+
+  }
+}
+
+for (plugin of plugins) {
+  if(plugin.command) {
+    for (var command in plugin.command) {
+      if (command.startsWith(argv._[0])) return require(plugin.command[command].file)(picto);
+    }
+  }
+}
+
+picto.web = require("./lib/web/server")(picto);
+
+console.log("updateing tags...");
+picto.db.updateTags(function(err) {
+  if (err) return console.error(err);
+  console.log("done updateing tags!");
+});

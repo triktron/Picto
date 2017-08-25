@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>picto</title>
+  <link rel="stylesheet" href="/css/core.css" />
+  <link rel="stylesheet" href="/css/nav.css" />
+  <link rel="stylesheet" href="/css/search.css" />
+  <script src="/js/xhr.js"></script>
+  <script src="/js/nav.js"></script>
+  <script src="/js/index.js"></script>
+  <script src="/js/search.js"></script>
+
+  <!-- perfect-scrollbar files -->
+  <script src="/js/libs/perfect-scrollbar.min.js"></script>
+  <link rel="stylesheet" href="/css/libs/perfect-scrollbar.min.css" />
+
+  <!-- Icons libs -->
+  <link rel="stylesheet" href="/css/libs/material-icons.css" />
+
+  <!-- All the PhotoSwipe files -->
+  <link rel="stylesheet" href="/js/libs/photoswipe.css">
+  <link rel="stylesheet" href="/js/libs/default-skin/default-skin.css">
+  <script src="/js/libs/photoswipe.min.js"></script>
+  <script src="/js/libs/photoswipe-ui-default.min.js"></script>
+
+  <!-- All the Awesomplete files -->
+  <link rel="stylesheet" href="/css/libs/awesomplete.css">
+  <script src="/js/libs/awesomplete.min.js"></script>
+
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport' />
+</head>
+
+<body>
+  <div class="nav">
+    <div class="top">
+      {% for nav in navs.top %}
+      <i class="material-icons" onclick="nav.changePath('/{{ nav.path }}',false,true)">{{ nav.icon }}</i> {% endfor %}
+    </div>
+    <div class="bottem">
+      {% for nav in navs.bottom %}
+      <i class="material-icons" onclick="nav.changePath('/{{ nav.path }}',false,true)">{{ nav.icon }}</i> {% endfor %}
+    </div>
+  </div>
+
+  <div class="content">
+    <input data-multiple />
+    <br>
+
+    {%- macro paginator() %}
+    <div class="paginator">
+      {%- macro link(p, q) %}/?offset={{ p }}{% if q %}
+        {%- if q != "" -%}&q={{ q }} {%- endif -%}{% endif %}{% endmacro %}
+
+      {%- if offset == 0 -%}
+        <span>« Previous</span>
+      {%- else -%}
+        <a href="{{ link(offset - limit, query) }}">« Previous</a>
+      {%- endif -%}
+
+      {%- for p in range(1, pages + 1) -%} {%- if p == page -%}
+      <span>{{ p }}</span> {%- else -%}
+      <a href="{{ link((p - 1) * limit, query) }}">{{ p }}</a> {%- endif -%} {%- endfor -%}
+      {%- if (total - limit) <= offset -%}
+      <span>Next »</span> {%- else -%}
+      <a href="{{ link(offset + limit, query) }}">Next »</a> {%- endif -%}
+    </div>
+    {% endmacro %}
+
+    {{ paginator() }}
+
+    <div class="tiles">
+      {% for img in images %}
+      <div class="item">
+        <div class="thumbnail"><a><img src="/image/{{ img.id }}"></a></div>
+      </div>
+      {% else %}
+        no images found
+      {% endfor %}
+    </div>
+
+    {{ paginator() }}
+  </div>
+
+  <!-- Root element of PhotoSwipe. Must have class pswp. -->
+  <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+      <!-- Background of PhotoSwipe.
+           It's a separate element, as animating opacity is faster than rgba(). -->
+      <div class="pswp__bg"></div>
+
+      <!-- Slides wrapper with overflow:hidden. -->
+      <div class="pswp__scroll-wrap">
+
+          <!-- Container that holds slides. PhotoSwipe keeps only 3 slides in DOM to save memory. -->
+          <!-- don't modify these 3 pswp__item elements, data is added later on. -->
+          <div class="pswp__container">
+              <div class="pswp__item"></div>
+              <div class="pswp__item"></div>
+              <div class="pswp__item"></div>
+          </div>
+
+          <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+          <div class="pswp__ui pswp__ui--hidden">
+
+              <div class="pswp__top-bar">
+
+                  <!--  Controls are self-explanatory. Order can be changed. -->
+
+                  <div class="pswp__counter"></div>
+
+                  <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                  <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                  <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                  <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                  <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                  <!-- element will get class pswp__preloader--active when preloader is running -->
+                  <div class="pswp__preloader">
+                      <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                          <div class="pswp__preloader__donut"></div>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                  <div class="pswp__share-tooltip"></div>
+              </div>
+
+              <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+              </button>
+
+              <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+              </button>
+
+              <div class="pswp__caption">
+                  <div class="pswp__caption__center"></div>
+              </div>
+
+            </div>
+
+          </div>
+
+  </div>
+</body>
+
+</html>

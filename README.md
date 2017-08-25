@@ -3,28 +3,30 @@ a tag based image viewer
 
 ### Demo
 
-view:(coming to you soon)
+view: [rhcloud](http://picto-triktron.rhcloud.com)
 
 ### Installation
-git clone this res.
+  download the latest release [here](https://github.com/triktron/Picto/releases/latest)
+  then run `npm install` and you're set to go!
 
 ### Usage
-  Usage: index.js [options]
+  Usage: ./picto [options]
 
   Options:
 
     -h, --help           output usage information
     -V, --version        output the version number
-    -p, --port <n>       Listen on port <n>
     -c, --config [file]  Load a specified configuration file [config.json]
-    -a, --add [files]    Add an image [image]
-    -r                   removes source image
-    -t, --tags [tags]    sets a tag for added images
-    -d, --description    sets a description for added images
-    -i, --info           sets the info for added images
+        --add [files]    Add an image [image]
+        --remove [id]    removes an image [id]
 
 
 ## Change Log
+
+### 0.3.X
+
+* complete rewrite
+* faster image navigation
 
 ### 0.2.X
 
@@ -38,10 +40,10 @@ git clone this res.
 * Initial version.
 
 ### Todo's
-* Write Demo
-* add in-page image adder.
-* add more ways to install.
-* Design icon
+- [x] write demo
+- [ ] add more ways to install
+- [ ] add in-page image adder
+- [ ] add settings
 
 License
 ----
